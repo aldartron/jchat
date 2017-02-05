@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 /**
  * Created by aldartron on 02.02.17.
@@ -30,10 +32,6 @@ public class ClientUI extends JFrame {
         this.setMinimumSize(new Dimension(600,480));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setVisible(true);
-        this.setTitle("JChat Client");
     }
 
-    public static void main(String[] args) {
-        ClientUI client = new ClientUI();
-    }
 }

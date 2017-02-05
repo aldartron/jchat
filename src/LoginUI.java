@@ -1,5 +1,3 @@
-import sun.rmi.runtime.Log;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,6 +7,7 @@ import java.awt.event.ActionListener;
  * Created by aldartron on 03.02.17.
  */
 public class LoginUI extends JFrame {
+
     private JLabel label = new JLabel("What is your Nickname?");
     private JTextField nickField = new JTextField();
     private JButton loginButton = new JButton("Login");
@@ -19,6 +18,9 @@ public class LoginUI extends JFrame {
         label.setHorizontalAlignment(SwingConstants.CENTER);
         nickField.setHorizontalAlignment(SwingConstants.CENTER);
         nickField.setFont(new Font("Consolas", Font.PLAIN, 20));
+
+        loginButton.addActionListener(new LoginListener());
+
         this.add(label, c);
         c.gridy = 1; c.weighty = 1.5;
         this.add(nickField, c);
@@ -39,7 +41,8 @@ public class LoginUI extends JFrame {
     class LoginListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-
+            new Client().login(nickField.getText());
+            dispose();
         }
     }
 }

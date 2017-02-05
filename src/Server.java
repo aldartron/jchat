@@ -6,6 +6,7 @@ import java.net.Socket;
  */
 public class Server {
 
+
     public static void main(String[] args) {
         try {
             ServerSocket socketListener = new ServerSocket(2345);
@@ -17,6 +18,6 @@ public class Server {
                 }
                 new ClientThread(client);
             }
-        } catch (Exception ex) {}
+        } catch (Exception ex) {ex.printStackTrace();}
     }
 }
