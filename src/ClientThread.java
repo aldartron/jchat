@@ -6,11 +6,13 @@ import java.net.Socket;
  */
 public class ClientThread extends Thread {
 
+    public Server server;
+
     private Socket socket;
     private String nickname;
 
-    private BufferedReader serverReader;
-    private BufferedWriter serverWriter;
+    ObjectOutputStream serverOut;
+    ObjectInputStream serverIn;
 
     ClientThread(Socket socket) {
         this.socket = socket;
@@ -20,19 +22,32 @@ public class ClientThread extends Thread {
     @Override
     public void run() {
         try {
-            serverReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            serverWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-            // Принимаем никнейм подключившегося пользователя
-            nickname = serverReader.readLine();
-            System.out.println(nickname + " подключился");
+            serverOut = new ObjectOutputStream(socket.getOutputStream());
+            serverIn = new ObjectInputStream(socket.getInputStream());
+
+            // Принимаем сообщения
+            while (true) {
+                server.broadcast((Message)serverIn.readObject());
+            }
 
         } catch (Exception ex) {ex.printStackTrace();}
         finally {
             try {
-                serverReader.close();
-                serverWriter.close();
+                serverIn.close();
+                serverOut.close();
+                System.out.println("CLientThread's streams are closed");
+            } catch (EOFException eofex) {
+                System.out.println("EOFException: input stream is closed");
             } catch (Exception ex) {ex.printStackTrace();}
         }
     }
+
+    public void say(Message message) {
+        // Передача сообщения клиенту
+        try {
+            serverOut.writeObject(message);
+        } catch (Exception ex) {ex.printStackTrace();}
+    }
+
 }

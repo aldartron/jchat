@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.Socket;
+import java.util.Date;
 
 /**
  * Created by aldartron on 03.02.17.
@@ -9,35 +10,56 @@ public class Client {
     private ClientUI ui;
     private String nickname;
 
-    private BufferedWriter clientWriter;
-    private BufferedReader clientReader;
+    private ObjectOutputStream clientOut;
+    private ObjectInputStream clientIn;
 
     Client() {
         ui = new ClientUI();
+        ui.client = this;
     }
 
     void login(String nickname) {
         this.nickname = nickname;
         ui.setTitle("JChat | " + nickname);
 
-        // Подключение к сервер
+        // Подключение к серверу
         try {
             Socket socket = new Socket("127.0.0.1", 2345);
 
-            clientReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            clientWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            clientOut = new ObjectOutputStream(socket.getOutputStream());
+            clientIn = new ObjectInputStream(socket.getInputStream());
 
-            // Передаем никнейм серверу
-            clientWriter.write(this.nickname);
+            // Передаем приветственное сообщение
+            send("[ Joined ]");
 
-            clientWriter.close();
-        } catch (IOException ioe) {ioe.printStackTrace();}
-        finally {
-            try {
-                clientReader.close();
-                clientWriter.close();
-            } catch (Exception ex) {ex.printStackTrace();}
-        }
+            new ClientMessageListener();
+
+        } catch (Exception ex) {ex.printStackTrace();}
     }
 
+    void send(String text) {
+        Message message = new Message(this.nickname, new Date(), text);
+        try {
+            clientOut.writeObject(message);
+        } catch (Exception ex) {ex.printStackTrace();}
+    }
+
+    class ClientMessageListener extends Thread {
+
+        ClientMessageListener() {
+            this.start();
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (true) {
+                    ui.say((Message) clientIn.readObject());
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
 }
+
