@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.Socket;
 
 /**
  * Created by aldartron on 03.02.17.
@@ -11,8 +13,12 @@ public class LoginUI extends JFrame {
     private JLabel label = new JLabel("What is your Nickname?");
     private JTextField nickField = new JTextField();
     private JButton loginButton = new JButton("Login");
+    private Client client;
+    private Socket socket;
 
-    LoginUI() {
+    LoginUI(Client client, Socket socket) {
+        this.client = client;
+        this.socket = socket;
         this.setLayout(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.CENTER,GridBagConstraints.BOTH,new Insets(3,3,3,3),0,0);
         label.setHorizontalAlignment(SwingConstants.CENTER);
@@ -34,14 +40,14 @@ public class LoginUI extends JFrame {
         this.setVisible(true);
     }
 
-    public static void main(String[] args) {
-        LoginUI loginUI = new LoginUI();
-    }
-
     class LoginListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent actionEvent) {
-            new Client().login(nickField.getText());
+            try {
+                client.login(nickField.getText(), socket);
+            } catch (IOException ioe) {
+                JOptionPane.showMessageDialog(null, "Ошибка подключения");
+            }
             dispose();
         }
     }
